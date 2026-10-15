@@ -1,0 +1,21 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Database backups and local data
+*.sql
+transactions-backup.sql
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Archives
+*.zip
+
+# OS files
+.DS_Store
