@@ -155,6 +155,10 @@ app.get('/slow', (req, res) => {
 
 // ── start ─────────────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-    console.log(`Expense backend v3 listening on port ${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Expense backend v3 listening on port ${PORT}`);
+    });
+}
+
+module.exports = app;
