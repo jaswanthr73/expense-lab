@@ -27,3 +27,13 @@ jobs:
          env:
           APP_LOG_PATH: /tmp/expense-test-app.log
          run: npm test 
+
+  build-backend-image:
+    runs-on: ubuntu-latest
+    needs: check-backend
+    steps:
+      - name: check repository
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t expense-backend:ci ./backend  
