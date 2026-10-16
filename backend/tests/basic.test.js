@@ -28,5 +28,5 @@ test('POST /transaction rejects a negative amount', async () => {
 });
 
 test('temporary CI failure demo', () => {
-  expect(1 + 1).toBe(3);
+  expect(1 + 1).toBe(2);
 });
