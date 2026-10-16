@@ -26,3 +26,7 @@ test('POST /transaction rejects a negative amount', async () => {
     'amount must be a positive integer'
   );
 });
+
+test('temporary CI failure demo', () => {
+  expect(1 + 1).toBe(3);
+});
