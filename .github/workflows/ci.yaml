@@ -1,3 +1,4 @@
+
 name: Expense CI
 
 on:
@@ -8,32 +9,58 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   check-backend:
     runs-on: ubuntu-latest
     steps:
-       - name: checkout repository
-         uses: actions/checkout@v4  
-       - name: Set up Node.js
-         uses: actions/setup-node@v4
-         with:
-           node-version: 20
-       - name: Install backend dependencies
-         working-directory: backend
-         run: npm ci
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-       - name: Run backend tests
-         working-directory: backend
-         env:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run backend tests
+        working-directory: backend
+        env:
           APP_LOG_PATH: /tmp/expense-test-app.log
-         run: npm test 
+        run: npm test
 
   build-backend-image:
     runs-on: ubuntu-latest
     needs: check-backend
     steps:
-      - name: check repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Build backend Docker image
-        run: docker build -t expense-backend:ci ./backend  
+        run: docker build -t expense-backend:ci ./backend
+
+      - name: Log in to Azure using OIDC
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to Azure Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: az acr login --name expenseacr1792342583
+
+      - name: Tag backend image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: docker tag expense-backend:ci expenseacr1792342583.azurecr.io/expense-backend:latest
+
+      - name: Push backend image to ACR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: docker push expenseacr1792342583.azurecr.io/expense-backend:latest
